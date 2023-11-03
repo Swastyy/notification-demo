@@ -1,0 +1,26 @@
+<!-- notification_app/templates/notification_app/notification.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notification System</title>
+</head>
+<body>
+    <div id="notifications"></div>
+    <audio id="notification-sound" src="" controls></audio>
+    <script>
+        const socket = new WebSocket('ws://yourserver/ws/notifications/');
+
+        socket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            const notificationDiv = document.getElementById('notifications');
+            const notificationElement = document.createElement('div');
+            notificationElement.innerText = data.message;
+            notificationDiv.appendChild(notificationElement);
+
+            const soundElement = document.getElementById('notification-sound');
+            soundElement.src = data.sound;
+            soundElement.play();
+        };
+    </script>
+</body>
+</html>
