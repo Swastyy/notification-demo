@@ -32,12 +32,19 @@ jobs:
               per_page: 100
             });
 
+            const firstMerge = pullRequests.length === 1;
+
+            // Output the result
+            console.log('Is first merge:', firstMerge);
+            console.log('Number of merged PRs:', pullRequests.length);
+
+            // Pass the result to the next step
             return {
-              firstMerge: pullRequests.length === 1
+              firstMerge: firstMerge
             }
             
-      - name: Check if pull request was merged
-        if: github.event.pull_request.merged == true && steps.check-merge.outputs.firstMerge == true
+      - name: Greet user on first merge
+        if: steps.check-merge.outputs.firstMerge == true
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
