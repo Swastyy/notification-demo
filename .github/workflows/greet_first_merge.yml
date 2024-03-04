@@ -8,8 +8,36 @@ jobs:
   greet:
     runs-on: ubuntu-latest
     steps:
+      - name: Check if it's the user's first merge
+        id: check-merge
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = await github.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number
+            });
+            const authorLogin = pr.data.user.login;
+
+            // Fetch user's merged pull requests
+            const { data: pullRequests } = await github.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              author: authorLogin,
+              per_page: 100
+            });
+
+            return {
+              firstMerge: pullRequests.length === 1
+            }
+            
       - name: Check if pull request was merged
-        if: github.event.pull_request.merged == true
+        if: github.event.pull_request.merged == true && steps.check-merge.outputs.firstMerge == true
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
