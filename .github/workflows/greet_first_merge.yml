@@ -44,7 +44,7 @@ jobs:
             }
             
       - name: Greet user on first merge
-        if: steps.check-merge.outputs.firstMerge == true
+        if: steps.check-merge.outputs.firstMerge == true && github.event.pull_request.merged == true
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
